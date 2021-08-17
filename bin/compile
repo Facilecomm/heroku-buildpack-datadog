@@ -40,16 +40,19 @@ mkdir -p "$APT_STATE_DIR/lists/partial"
 mkdir -p "$DD_AGENT_ROOT"
 mkdir -p "$GPG_HOME_DIR"
 
-topic "Adding GPG key"
-# This mimics the behavior of apt-key add to create a non-standard keyring and
-# import the datadog key into it.
-gpg --ignore-time-conflict --no-options --no-default-keyring --homedir $GPG_HOME_DIR --keyring $GPG_KEYRING_FILE --import $GPG_KEY_FILE | indent
+topic "Enable HTTPS for APT"
+apt-get $APT_OPTIONS install apt-transport-https
+
+topic "Adding GPG keys"
+sh -c "echo \"$(cat $APT_REPO_FILE)deb https://apt.datadoghq.com/ stable 6\" > $APT_BUILD_DIR/sources.list.d/datadog.list"
+apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 A2923DFF56EDA6E76E55E492D3A80E30382E94DE
+apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 D75CEA17048B9ACBF186794B32637D44F14F620E
 
 topic "Updating apt caches"
 apt-get $APT_OPTIONS update | indent
 
 topic "Fetching datadog-agent"
-apt-get $APT_OPTIONS -y --force-yes -d install --reinstall --no-install-recommends datadog-agent=1:5.11.2-1 | indent
+apt-get $APT_OPTIONS -y --force-yes -d install --reinstall --no-install-recommends datadog-agent=1:6.29.1-1 | indent
 
 topic "Fetching deb packages"
 for DEB in $(ls -1 $APT_CACHE_DIR/archives/*.deb); do
