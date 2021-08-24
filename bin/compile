@@ -41,6 +41,9 @@ mkdir -p "$DD_AGENT_ROOT"
 mkdir -p "$GPG_HOME_DIR"
 
 topic "Adding Datadog GPG keys"
+
+echo "deb [signed-by=$GPG_KEYRING_FILE] https://apt.datadoghq.com/ stable main" > $APT_REPO_FILE
+
 curl -s -N https://keys.datadoghq.com/DATADOG_APT_KEY_CURRENT.public | gpg --no-default-keyring --keyring $GPG_KEYRING_FILE --import --batch --homedir $GPG_HOME_DIR
 curl -s -N https://keys.datadoghq.com/DATADOG_APT_KEY_382E94DE.public | gpg --no-default-keyring --keyring $GPG_KEYRING_FILE --import --batch --homedir $GPG_HOME_DIR
 curl -s -N https://keys.datadoghq.com/DATADOG_APT_KEY_F14F620E.public | gpg --no-default-keyring --keyring $GPG_KEYRING_FILE --import --batch --homedir $GPG_HOME_DIR
